@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Empyrean Dice</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="station-shell" aria-labelledby="station-title">
+      <section class="roll-field" aria-label="Dice rolling station">
+        <div class="station-header">
+          <div>
+            <p class="eyebrow">Player Station Prototype</p>
+            <h1 id="station-title">Empyrean Dice</h1>
+          </div>
+          <div class="status-pill" id="dice-count" aria-live="polite">No dice loaded</div>
+        </div>
+
+        <div class="main-grid">
+          <section class="control-panel" aria-label="Dice controls">
+            <div class="panel-section">
+              <h2>Load Dice</h2>
+              <div class="dice-buttons" id="dice-buttons">
+                <button type="button" class="die-picker" data-sides="4">D4</button>
+                <button type="button" class="die-picker" data-sides="6">D6</button>
+                <button type="button" class="die-picker" data-sides="8">D8</button>
+                <button type="button" class="die-picker" data-sides="10">D10</button>
+                <button type="button" class="die-picker" data-sides="12">D12</button>
+                <button type="button" class="die-picker" data-sides="20">D20</button>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="section-row">
+                <h2>Dice Pool</h2>
+                <button type="button" class="ghost-button" id="clear-pool">Clear</button>
+              </div>
+              <div class="pool-list empty" id="pool-list" aria-live="polite">
+                Select a die type to add it here.
+              </div>
+            </div>
+
+            <div class="panel-section modifier-row">
+              <label for="modifier">Modifier</label>
+              <input id="modifier" type="text" value="0" inputmode="numeric" autocomplete="off">
+            </div>
+
+            <button type="button" class="roll-button" id="roll-button">Roll</button>
+          </section>
+
+          <section class="result-panel" aria-label="Roll result">
+            <div class="crit-banner" id="crit-banner" aria-live="assertive"></div>
+            <div class="die-stage" id="die-stage" aria-live="polite">
+              <canvas id="dice-canvas" aria-hidden="true"></canvas>
+              <div class="stage-message" id="stage-message">READY</div>
+            </div>
+
+            <div class="score-strip">
+              <div>
+                <span class="score-label">Dice</span>
+                <strong id="dice-total">0</strong>
+              </div>
+              <div>
+                <span class="score-label">Mod</span>
+                <strong id="modifier-total">+0</strong>
+              </div>
+              <div>
+                <span class="score-label">Total</span>
+                <strong id="grand-total">0</strong>
+              </div>
+            </div>
+
+            <div class="roll-log" id="roll-log" aria-label="Roll history">
+              <p>No rolls yet.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="app.js?v=sound1"></script>
+  </body>
+</html>
