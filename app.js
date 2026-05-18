@@ -1,4 +1,4 @@
-import * as THREE from "./node_modules/three/build/three.module.js";
+import * as THREE from "./assets/vendor/three.module.js";
 
 const diceButtons = document.querySelectorAll(".die-picker");
 const poolList = document.querySelector("#pool-list");
@@ -25,7 +25,7 @@ const dieColors = {
   8: 0x7dd6ff,
   10: 0x9287ff,
   12: 0xff8ea6,
-  20: 0xf7f0df
+  20: 0xf7f0df,
 };
 
 const labelOffsets = {
@@ -34,7 +34,7 @@ const labelOffsets = {
   8: 1.12,
   10: 1.08,
   12: 1.08,
-  20: 1.1
+  20: 1.1,
 };
 
 let dicePool = [];
@@ -54,7 +54,7 @@ camera.position.set(0, 4.1, 8);
 const renderer = new THREE.WebGLRenderer({
   canvas,
   alpha: true,
-  antialias: true
+  antialias: true,
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -80,8 +80,8 @@ const floor = new THREE.Mesh(
   new THREE.CircleGeometry(7, 64),
   new THREE.ShadowMaterial({
     color: 0x02080a,
-    opacity: 0.28
-  })
+    opacity: 0.28,
+  }),
 );
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -1.28;
@@ -179,14 +179,27 @@ function connectSoundNodes(source, volume, pan) {
   gain.connect(audioMaster);
 }
 
-function playDiceSoundSlice({ duration, offset, pan, playbackRate, volume, when }) {
+function playDiceSoundSlice({
+  duration,
+  offset,
+  pan,
+  playbackRate,
+  volume,
+  when,
+}) {
   if (!diceSoundBuffer || !audioContext) {
     return;
   }
 
   const source = audioContext.createBufferSource();
-  const safeOffset = Math.min(offset, Math.max(0, diceSoundBuffer.duration - 0.05));
-  const safeDuration = Math.min(duration, diceSoundBuffer.duration - safeOffset);
+  const safeOffset = Math.min(
+    offset,
+    Math.max(0, diceSoundBuffer.duration - 0.05),
+  );
+  const safeDuration = Math.min(
+    duration,
+    diceSoundBuffer.duration - safeOffset,
+  );
 
   if (safeDuration <= 0) {
     return;
@@ -195,10 +208,18 @@ function playDiceSoundSlice({ duration, offset, pan, playbackRate, volume, when 
   source.buffer = diceSoundBuffer;
   source.playbackRate.value = playbackRate;
   connectSoundNodes(source, volume, pan);
-  source.start(Math.max(audioContext.currentTime, when), safeOffset, safeDuration);
+  source.start(
+    Math.max(audioContext.currentTime, when),
+    safeOffset,
+    safeDuration,
+  );
 }
 
-async function scheduleRollAudio(actors, animationStartedAt, audioReadyPromise) {
+async function scheduleRollAudio(
+  actors,
+  animationStartedAt,
+  audioReadyPromise,
+) {
   try {
     const buffer = await audioReadyPromise;
 
@@ -222,7 +243,7 @@ async function scheduleRollAudio(actors, animationStartedAt, audioReadyPromise) 
         pan: 0,
         playbackRate: 0.92 + Math.random() * 0.08,
         volume: 0.26,
-        when: bedWhen
+        when: bedWhen,
       });
     }
 
@@ -233,7 +254,10 @@ async function scheduleRollAudio(actors, animationStartedAt, audioReadyPromise) 
         return;
       }
 
-      const landingSeconds = Math.max(0, state.duration / 1000 - elapsedSeconds - 0.05);
+      const landingSeconds = Math.max(
+        0,
+        state.duration / 1000 - elapsedSeconds - 0.05,
+      );
       const landingWhen = now + landingSeconds;
       const pan = THREE.MathUtils.clamp(actor.home.x / 4.5, -0.75, 0.75);
       const volume = Math.max(0.18, 0.44 - index * 0.035);
@@ -241,7 +265,7 @@ async function scheduleRollAudio(actors, animationStartedAt, audioReadyPromise) 
       lastAudioEvents.push({
         at: landingWhen,
         die: `D${actor.sides}`,
-        kind: "landing"
+        kind: "landing",
       });
 
       playDiceSoundSlice({
@@ -250,7 +274,7 @@ async function scheduleRollAudio(actors, animationStartedAt, audioReadyPromise) 
         pan,
         playbackRate: 0.86 + Math.random() * 0.24,
         volume,
-        when: landingWhen
+        when: landingWhen,
       });
     });
   } catch (error) {
@@ -307,7 +331,11 @@ function createPentagonalBipyramidGeometry() {
     const angle = (index / 5) * fullTurn - Math.PI / 2;
     const nextAngle = ((index + 1) / 5) * fullTurn - Math.PI / 2;
     const point = [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
-    const nextPoint = [Math.cos(nextAngle) * radius, 0, Math.sin(nextAngle) * radius];
+    const nextPoint = [
+      Math.cos(nextAngle) * radius,
+      0,
+      Math.sin(nextAngle) * radius,
+    ];
     const top = [0, height, 0];
     const bottom = [0, -height, 0];
 
@@ -316,7 +344,10 @@ function createPentagonalBipyramidGeometry() {
   }
 
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
   geometry.computeVertexNormals();
   return geometry;
 }
@@ -357,7 +388,7 @@ function createLabelTexture() {
   return {
     canvas: labelCanvas,
     context: labelCanvas.getContext("2d"),
-    texture
+    texture,
   };
 }
 
@@ -400,16 +431,16 @@ function createDieActor(sides) {
       color: dieColors[sides],
       roughness: 0.42,
       metalness: 0.08,
-      emissive: new THREE.Color(dieColors[sides]).multiplyScalar(0.06)
-    })
+      emissive: new THREE.Color(dieColors[sides]).multiplyScalar(0.06),
+    }),
   );
   const edgeLines = new THREE.LineSegments(
     new THREE.EdgesGeometry(geometry, 15),
     new THREE.LineBasicMaterial({
       color: 0x071116,
       transparent: true,
-      opacity: 0.3
-    })
+      opacity: 0.3,
+    }),
   );
   const label = createLabelTexture();
   const labelPlane = new THREE.Mesh(
@@ -418,8 +449,8 @@ function createDieActor(sides) {
       map: label.texture,
       transparent: true,
       depthTest: false,
-      depthWrite: false
-    })
+      depthWrite: false,
+    }),
   );
 
   mesh.castShadow = true;
@@ -438,7 +469,7 @@ function createDieActor(sides) {
     home: new THREE.Vector3(),
     label,
     rollState: null,
-    sides
+    sides,
   };
 
   body.rotation.copy(getRestRotation(sides, 0));
@@ -456,7 +487,9 @@ function disposeObject(object) {
     return;
   }
 
-  const materials = Array.isArray(object.material) ? object.material : [object.material];
+  const materials = Array.isArray(object.material)
+    ? object.material
+    : [object.material];
   materials.forEach((material) => {
     if (material.map) {
       material.map.dispose();
@@ -481,7 +514,7 @@ function getRestRotation(sides, value) {
     -0.26 + twist * 0.25,
     0.34 + twist,
     0.12 - twist * 0.18,
-    "XYZ"
+    "XYZ",
   );
 }
 
@@ -533,9 +566,8 @@ function syncDiceActors() {
 }
 
 function updatePoolDisplay() {
-  diceCount.textContent = dicePool.length === 0
-    ? "No dice loaded"
-    : `${dicePool.length} dice loaded`;
+  diceCount.textContent =
+    dicePool.length === 0 ? "No dice loaded" : `${dicePool.length} dice loaded`;
 
   rollButton.disabled = dicePool.length === 0 || isRolling;
   stageMessage.classList.toggle("hidden", dicePool.length > 0);
@@ -649,8 +681,8 @@ function startActorRoll(actor, result, index) {
       readableRotation.x + spinX,
       readableRotation.y + spinY,
       readableRotation.z + spinZ,
-      "XYZ"
-    )
+      "XYZ",
+    ),
   };
 
   drawDieLabel(actor, "?");
@@ -658,7 +690,8 @@ function startActorRoll(actor, result, index) {
 
 function updateActorRoll(actor, now) {
   if (!actor.rollState) {
-    const bob = Math.sin(now * 0.0015 + actor.home.x * 0.6 + actor.home.z) * 0.045;
+    const bob =
+      Math.sin(now * 0.0015 + actor.home.x * 0.6 + actor.home.z) * 0.045;
     actor.group.position.y = actor.home.y + bob;
     return;
   }
@@ -669,17 +702,18 @@ function updateActorRoll(actor, now) {
   const bounce = Math.sin(progress * Math.PI) * 1.12;
   const drift = Math.sin(progress * Math.PI) * state.sideways;
   const impactProgress = progress > 0.86 ? (progress - 0.86) / 0.14 : 0;
-  const impactPulse = impactProgress > 0 ? Math.sin(impactProgress * Math.PI) * 0.08 : 0;
+  const impactPulse =
+    impactProgress > 0 ? Math.sin(impactProgress * Math.PI) * 0.08 : 0;
 
   actor.body.rotation.set(
     THREE.MathUtils.lerp(state.startRotation.x, state.targetRotation.x, eased),
     THREE.MathUtils.lerp(state.startRotation.y, state.targetRotation.y, eased),
-    THREE.MathUtils.lerp(state.startRotation.z, state.targetRotation.z, eased)
+    THREE.MathUtils.lerp(state.startRotation.z, state.targetRotation.z, eased),
   );
   actor.group.position.set(
     actor.home.x + drift,
     actor.home.y + bounce,
-    actor.home.z + Math.sin(progress * fullTurn) * 0.12
+    actor.home.z + Math.sin(progress * fullTurn) * 0.12,
   );
   actor.group.scale.setScalar(actor.baseScale * (1 + impactPulse));
 
@@ -730,7 +764,7 @@ async function rollPool() {
 
   const results = dicePool.map((sides) => ({
     sides,
-    value: rollDie(sides)
+    value: rollDie(sides),
   }));
   const diceTotal = results.reduce((sum, result) => sum + result.value, 0);
   const modifier = getModifier();
@@ -794,7 +828,7 @@ function getCanvasPixelStats() {
   return {
     height,
     paintedPixels,
-    width
+    width,
   };
 }
 
@@ -834,10 +868,10 @@ window.empyreanDiceDebug = {
       contextState: audioContext ? audioContext.state : "not-created",
       lastAudioEvents,
       loadError: diceSoundLoadError ? diceSoundLoadError.message : null,
-      soundLoaded: Boolean(diceSoundBuffer)
+      soundLoaded: Boolean(diceSoundBuffer),
     };
   },
-  getCanvasPixelStats
+  getCanvasPixelStats,
 };
 
 resizeRenderer();

@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "check": "node --check app.js",
-    "start": "python -m http.server 4173 --bind 127.0.0.1",
+    "start": "python -m http.server 4174 --bind 127.0.0.1",
     "test": "npm run check"
   },
   "keywords": [],
